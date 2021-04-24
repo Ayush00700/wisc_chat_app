@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "461880932780",
+    "project_id": "wiscchat",
+    "storage_bucket": "wiscchat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:461880932780:android:17e5db11e7a8ad164b2209",
+        "android_client_info": {
+          "package_name": "bitspilani.wiscchatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "461880932780-pbel50j385rm8c4vq5jenvgjcl18udkd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6d3IFzYuFtCBimH5tpwpjPcuYz88aquM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "461880932780-pbel50j385rm8c4vq5jenvgjcl18udkd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
