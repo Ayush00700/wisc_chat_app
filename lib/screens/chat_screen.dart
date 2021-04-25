@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:wiscchatapp/constants.dart';
 import 'package:flutter/rendering.dart';
 import 'package:wiscchatapp/screens/options_screen.dart';
+import 'package:wiscchatapp/screens/welcome_screen.dart';
 import 'package:wiscchatapp/services/on_press_delete.dart';
+import 'package:wiscchatapp/components/joined_group.dart';
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chat_screen';
@@ -35,11 +37,33 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         leading: null,
         actions: <Widget>[
-          IconButton(
+          Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: DropdownButton<String>(
               icon: Icon(Icons.more_vert),
-              onPressed: () {
-                //Implement logout functionality
-              }),
+              iconDisabledColor: Colors.white,
+              iconEnabledColor: Colors.white,
+              iconSize: 25.0,
+              items: <String>['Signout'].map((String value) {
+                return new DropdownMenuItem<String>(
+                  value: value,
+                  child: new Text(value),
+                );
+              }).toList(),
+              onChanged: (_) async {
+                setState(() {
+                  _showSpinner = true;
+                });
+                await FirebaseAuth.instance.signOut();
+
+                setState(() {
+                  _showSpinner = false;
+                });
+                Navigator.pushNamedAndRemoveUntil(
+                    context, WelcomeScreen.id, (route) => false);
+              },
+            ),
+          )
         ],
         title: Row(
           children: [
@@ -68,79 +92,91 @@ class _ChatScreenState extends State<ChatScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Expanded(
-                child: ListView(
-                  reverse: true,
-                  physics: BouncingScrollPhysics(),
-                  shrinkWrap: true,
-                  children: [
-                    StreamBuilder<QuerySnapshot>(
-                        stream: FirebaseFirestore.instance
-                            .collection('chats')
-                            .snapshots(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<QuerySnapshot> snapshot) {
-                          List<String> chats = [];
-                          List<String> person = [];
-                          List<String> time = [];
-                          final chatmessages = snapshot.data.docs;
-                          for (DocumentSnapshot chat in chatmessages) {
-                            chats.add(chat.get('chat').toString());
-                            person.add(chat.get('name').toString());
-                            time.add(chat.id);
-                          }
-                          return ListView.builder(
-                            // scrollDirection: Axis.vertical,
-                            physics: BouncingScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: chats.length,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onLongPress: () {
-                                  if (person[index] == _currentUserName) {
-                                    DeleteFunction('Chat', (int id) {
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: ListView(
+                    reverse: true,
+                    physics: BouncingScrollPhysics(),
+                    shrinkWrap: true,
+                    children: [
+                      StreamBuilder<QuerySnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('chats')
+                              .snapshots(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<QuerySnapshot> snapshot) {
+                            List<String> chats = [];
+                            List<String> person = [];
+                            List<String> time = [];
+                            final chatmessages = snapshot.data.docs;
+                            for (DocumentSnapshot chat in chatmessages) {
+                              chats.add(chat.get('chat').toString());
+                              person.add(chat.get('name').toString());
+                              time.add(chat.id);
+                            }
+                            return ListView.builder(
+                              // scrollDirection: Axis.vertical,
+                              physics: BouncingScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: chats.length,
+                              itemBuilder: (context, index) {
+                                if (chats[index] != '')
+                                  return GestureDetector(
+                                    onLongPress: () {
+                                      if (person[index] == _currentUserName) {
+                                        DeleteFunction('Chat', (int id) {
+                                          FirebaseFirestore.instance
+                                              .collection('chats')
+                                              .doc(time[id])
+                                              .delete();
+                                          FocusScope.of(context)
+                                              .requestFocus(new FocusNode());
+                                        }, (bool spin) {
+                                          setState(() {
+                                            _showSpinner = spin;
+                                          });
+                                        }).showDialogBox(context, index);
+                                      }
+                                    },
+                                    child: ChatBubble(
+                                      text: chats[index],
+                                      sender: person[index] != _currentUserName
+                                          ? true
+                                          : false,
+                                      senderName:
+                                          person[index] != _currentUserName
+                                              ? person[index]
+                                              : 'Me',
+                                    ),
+                                  );
+                                else
+                                  return GestureDetector(
+                                    onLongPress: () {
+                                      DeleteFunction('Chat', (int id) {
+                                        FirebaseFirestore.instance
+                                            .collection('chats')
+                                            .doc(time[id])
+                                            .delete();
+                                        FocusScope.of(context)
+                                            .requestFocus(new FocusNode());
+                                      }, (bool spin) {
+                                        setState(() {
+                                          _showSpinner = spin;
+                                        });
+                                      }).showDialogBox(context, index);
+
                                       FirebaseFirestore.instance
-                                          .collection('chats')
-                                          .doc(time[id])
-                                          .delete();
-                                      FocusScope.of(context)
-                                          .requestFocus(new FocusNode());
-                                    }, (bool spin) {
-                                      setState(() {
-                                        _showSpinner = spin;
-                                      });
-                                    }).showDialogBox(context, index);
-                                  }
-                                },
-                                child: ChatBubble(
-                                  text: chats[index],
-                                  sender: person[index] != _currentUserName
-                                      ? true
-                                      : false,
-                                  senderName: person[index] != _currentUserName
-                                      ? person[index]
-                                      : 'Me',
-                                ),
-                              );
-                            },
-                          );
-                        }),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Center(
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15.0))),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 10.0, vertical: 5.0),
-                            child: Text('You joined'),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                                          .collection('users')
+                                          .doc(_currentUser.email)
+                                          .update({'joinedChat': false});
+                                    },
+                                    child: JoinedGroup(name: person[index]),
+                                  );
+                              },
+                            );
+                          }),
+                    ],
+                  ),
                 ),
               ),
               Container(

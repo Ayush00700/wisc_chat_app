@@ -79,7 +79,34 @@ class _OptionScreenState extends State<OptionScreen> {
                 ),
                 RoundedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, ChatScreen.id);
+                    setState(() {
+                      _showSpinner = true;
+                    });
+                    FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(_currentUser.email)
+                        .get()
+                        .then((value) {
+                      if (!value.get('joinedChat')) {
+                        FirebaseFirestore.instance
+                            .collection('chats')
+                            .doc(DateTime.now().toString())
+                            .set({
+                          'name': _currentUserName,
+                          'email': _currentUser.email,
+                          'chat': ''
+                        }).then((value) {
+                          FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(_currentUser.email)
+                              .update({'joinedChat': true});
+                        });
+                      }
+                      setState(() {
+                        _showSpinner = false;
+                      });
+                      Navigator.pushNamed(context, ChatScreen.id);
+                    });
                   },
                   text: 'Join Chat',
                   color: Colors.lightBlueAccent,

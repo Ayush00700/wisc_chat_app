@@ -47,7 +47,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       FirebaseFirestore.instance
           .collection('users')
           .doc(email)
-          .set({'name': name});
+          .set({'name': name, 'joinedChat': false});
       FirebaseAuth.instance
           .signInWithEmailAndPassword(email: emailId, password: passwordId);
       setState(() {
@@ -69,7 +69,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     setState(() {
       _showSpinner = false;
     });
-    // FirebaseAuth.instance.currentUser.;
   }
 
   @override
@@ -128,31 +127,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 },
                 obscureText: true,
               ),
-              // TextField(
-              //     onChanged: (value) {
-              //       nameId = value;
-              //     },
-              //     decoration: kTextFieldDecoration.copyWith(
-              //         hintText: 'Enter your Name')),
-              // SizedBox(
-              //   height: 8.0,
-              // ),
-              // TextField(
-              //     onChanged: (value) {
-              //       emailId = value;
-              //     },
-              //     decoration: kTextFieldDecoration.copyWith(
-              //         hintText: 'Enter your email')),
-              // SizedBox(
-              //   height: 8.0,
-              // ),
-              // TextField(
-              //     obscureText: true,
-              //     onChanged: (value) {
-              //       passwordId = value;
-              //     },
-              //     decoration: kTextFieldDecoration.copyWith(
-              //         hintText: 'Enter your password')),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: RoundedButton(
