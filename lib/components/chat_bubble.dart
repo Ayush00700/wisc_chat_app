@@ -16,7 +16,8 @@ class ChatBubble extends StatelessWidget {
           ? EdgeInsets.only(top: 8, bottom: 8, left: 40, right: 16)
           : EdgeInsets.only(top: 8, bottom: 8, left: 16, right: 40),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            sender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Container(
             decoration: BoxDecoration(
@@ -44,10 +45,11 @@ class ChatBubble extends StatelessWidget {
                     senderName,
                     textAlign: sender ? TextAlign.end : TextAlign.start,
                     style: TextStyle(
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       color: Colors.black,
                     ),
                   ),
+                  SizedBox(height: 3.0),
                   Text(
                     text,
                     // textAlign: sender ? TextAlign.end : TextAlign.start,
